@@ -1,19 +1,5 @@
 # Client-Side-Security
 
-To test client-side security "cleanly," you have to act like a plumber inspecting a building's water system. You aren't just looking for a leak; you are tracing where the water enters, where it flows, and where it eventually comes out of the tap.
-
----
-
-## The "Water System" Analogy
-* **The Source (The Intake):** This is where the user (or attacker) puts "water" into your pipes. (e.g., the URL Bar, Cookies, or Local Storage).
-* **The Code (The Pipe):** The JavaScript functions that move that data around. If the pipe has a "Filter" (Sanitization), the water stays clean.
-* **The Sink (The Tap):** Where the data is finally used or displayed. If dirty water reaches a "Tap" like `.innerHTML`, it splashes the user with a virus (XSS).
-
-Think of it like a **water pipe**:
-1.  **The Source (The Intake):** Where the user (attacker) puts data into the pipe (e.g., the URL).
-2.  **The Code (The Pipe):** The JavaScript functions that move the data around.
-3.  **The Sink (The Tap):** Where the data comes out and is "executed" by the browser.
-
 ---
 
 ## a. The Core Concept: Source, Sink, and Result
@@ -52,7 +38,9 @@ Now you need to know where the variable like e.g `expando` came from.
 2.  In the search box that appears at the bottom, type: var expando = or just expando =.
 3.  Look through the results. You are looking for the line where expando is assigned a value for the first time.
 
-Analyze the Assignment
+---
+
+## Analyze the Assignment
 
 Once you find that line, look at what is on the right side of the = sign. This tells you if the test is a Pass or a Fail.
 
@@ -77,12 +65,6 @@ or
 
 ---
 
-Does your code look like one giant, long line of text? If so, clicking that **`{ }`** button is the first step to making sense of it. What do you see when you search for `location.hash`?
-
-To understand client-side security, you have to think like a data-tracker. In the browser, "Source-to-Sink" is the path that data travels. If that path isn't "cleaned" (sanitized or encoded) along the way, the application is vulnerable.
-
----
-
 ## b. Deep Dive: The Dangerous Sinks
 
 ### `.innerHTML`
@@ -99,67 +81,86 @@ To understand client-side security, you have to think like a data-tracker. In th
 * **Security Risk:** This is the most dangerous sink. If an attacker can get their input into an `eval()` call, they have full execution rights. **Never use `eval()` with user-controlled data.**
 
 ---
+
+Does your code look like one giant, long line of text? If so, clicking that **`{ }`** button is the first step to making sense of it. What do you see when you search for `location.hash`?
+
+To understand client-side security, you have to think like a data-tracker. In the browser, "Source-to-Sink" is the path that data travels. If that path isn't "cleaned" (sanitized or encoded) along the way, the application is vulnerable.
+
 To test these vulnerabilities effectively, you must focus on how the browser's Document Object Model (DOM) handles data. In client-side security, the vulnerability isn't usually in the database, but in the **JavaScript logic** running in the user's browser.
+
+To perform a **clean** end-to-end security test on the client side, you must act like a plumber inspecting a building's water system. You aren't just looking for a leak; you are tracing where the "water" (data) enters, how it flows through the "pipes" (JavaScript), and where it eventually comes out of the "tap" (the browser's display).
 
 ---
 
-## 1. DOM-based XSS & JS Execution
-**The Goal:** Prove that "dirty water" from the URL reaches an execution "tap" like `eval()` or `.innerHTML`.
-1.  **Source:** Add a "Honeypot" to your URL: `site.com/#ZXC123`.
-2.  **Trace:** In DevTools **Sources**, search (`Ctrl+Shift+F`) for `.innerHTML` or `eval(`.
-3.  **The Tap:** Set a **Breakpoint** on that line. Refresh the page.
-4.  **Verify:** Look at the **Scope** window. If the variable equals `"ZXC123"`, the pipe is connected.
-5.  **Clean Fail:** If you can change the URL to `#<img src=x onerror=alert(1)>` and an alert pops, it's a **FAIL**.
+## The "Water System" Analogy
+* **The Source (The Intake):** Where an attacker puts "dirty water" into the system (e.g., URL Bar, Local Storage, or Cookies).
+* **The Code (The Pipe):** The JavaScript logic. If the pipe has a **Filter** (Sanitization), the water stays clean.
+* **The Sink (The Tap):** Where the data is finally executed or displayed. If dirty water reaches a "Tap" like `.innerHTML`, it "splashes" the user with a script.
+
+---
+
+## 1. DOM-based XSS & JavaScript Execution
+**The Goal:** Prove that data from a URL source reaches a dangerous execution sink.
+1.  **Find the Tap (Sink):** In DevTools **Sources**, search (`Ctrl+Shift+F`) for `.innerHTML`, `document.write(`, or `eval(`.
+2.  **Trace to Intake (Source):** Look for variables that pull from `location.hash` or `location.search`.
+3.  **The Test:** Append a unique string to the URL: `site.com/#ZXC123`.
+4.  **Verify:** Set a **Breakpoint** on the sink. If the variable equals `"ZXC123"`, the pipe is connected.
+5.  **Clean Fail:** If you change the URL to `#<img src=x onerror=alert(domain)>` and the alert pops, it is a **FAIL**.
 
 ## 2. HTML & CSS Injection
-**The Goal:** Inject "dye" into the water to change how the room looks (defacement or data theft).
-1.  **Source:** Any input field that reflects on the page (e.g., "Hello, [Name]").
-2.  **HTML Test:** Input `<h1>Hacked</h1>`. If the text becomes huge, the "Tap" isn't filtering tags.
-3.  **CSS Test:** Input `<style>body{background:red;}</style>`.
-4.  **Clean Result:** If the page turns red, the "Tap" is vulnerable to CSS Injection. It’s a **FAIL**.
+**The Goal:** Inject "dye" into the water to change the UI or steal data.
+1.  **HTML Test:** Find a field that reflects input (e.g., "Welcome, [Name]"). Input `<u>Test</u>`.
+    * **FAIL:** The text is underlined in the browser.
+2.  **CSS Test:** Input `<style>body{background:red;}</style>`.
+    * **FAIL:** The page background turns red. This proves an attacker can inject styles to "hide" real buttons or "overlay" fake ones.
 
 ## 3. Client-Side URL Redirect
-**The Goal:** Prove the "Exit Pipe" can be pointed to a dangerous location.
-1.  **Source:** Look for URL parameters like `?next=` or `?redirect=`.
-2.  **The Test:** Change it to `?next=https://google.com`.
-3.  **The Tap:** In **Sources**, search for `window.location.href =`.
-4.  **Clean Result:** If the browser leaves the site and goes to Google, it's a **FAIL**.
+**The Goal:** Prove the "Exit Pipe" can be pointed to a malicious external site.
+1.  **The Source:** Look for URL parameters like `?next=` or `?redirect_to=`.
+2.  **The Pipe:** Search **Sources** for `window.location.href =` or `location.replace(`.
+3.  **The Test:** Change the parameter to `?next=https://google.com`.
+4.  **Clean Result:** If the browser leaves the target domain and loads Google, it is a **FAIL**.
 
 ## 4. Cross-Origin Resource Sharing (CORS)
-**The Goal:** Check if the "Back Door" is left open for other websites to steal water.
+**The Goal:** Check if the "Back Door" is open for other sites to steal private data.
 1.  **The Test:** Use **Burp Suite** or **curl**. Add the header: `Origin: https://evil.com`.
-2.  **The Check:** Look at the response headers.
-3.  **Clean Fail:** If you see `Access-Control-Allow-Origin: https://evil.com` AND `Access-Control-Allow-Credentials: true`, any site can steal the user's data. **FAIL**.
+2.  **The Response:** Look at the headers returned by the server.
+3.  **Clean Fail:** If you see `Access-Control-Allow-Origin: https://evil.com` **AND** `Access-Control-Allow-Credentials: true`, any site can steal the user's session data. **FAIL**.
 
 ## 5. Clickjacking
-**The Goal:** Prove your "Water Meter" can be hidden under a fake cover.
+**The Goal:** Prove the website can be "hidden" under a fake cover to trick users.
 1.  **The Test:** Create a local `.html` file on your PC:
     `<html><body><iframe src="https://target-site.com" style="opacity:0.5;"></iframe></body></html>`
-2.  **The Check:** Open it in a browser.
-3.  **Clean Result:** If you see the website inside the frame, it's a **FAIL**. If the browser blocks it, it's a **PASS**.
+2.  **Verify:** Open the file in Edge/Chrome.
+3.  **Clean Result:** If you see the website inside the frame, it's a **FAIL**. If the browser blocks it (check Console for `X-Frame-Options` errors), it's a **PASS**.
 
 
 
-## 6. WebSockets & Web Messaging
-**The Goal:** Test the "Intercom System" between different parts of the building.
-1.  **Web Messaging:** Search **Sources** for `window.addEventListener("message", ...)`.
-2.  **The Test:** In the **Console**, type: `window.postMessage("HACK", "*")`.
-3.  **Clean Fail:** If the app processes "HACK" without checking who sent it (`event.origin`), it's a **FAIL**.
-4.  **WebSockets:** In DevTools **Network > WS**, watch the messages. If you can "Replay" a message in Burp to perform an action, it's a **FAIL**.
+## 6. Web Messaging (postMessage)
+**The Goal:** Test the "Intercom" between different windows/iframes.
+1.  **Find Listeners:** Search **Sources** for `window.addEventListener("message", ...)`.
+2.  **The Test:** In the **Console**, type: `window.postMessage({"action":"delete"}, "*")`.
+3.  **Clean Fail:** If the app performs the action without checking `event.origin`, it is a **FAIL**.
 
-## 7. Local Storage
+## 7. WebSockets
+**The Goal:** Intercept the real-time "Radio Stream" of data.
+1.  **Monitor:** Go to DevTools **Network > WS** tab.
+2.  **The Test:** Perform an action and watch the messages.
+3.  **Clean Fail:** If sensitive data (passwords, tokens) is sent in plain text, or if you can "Replay" a message in Burp to repeat an action, it is a **FAIL**.
+
+## 8. Local Storage
 **The Goal:** Check if sensitive "Bottled Water" is left in an unlocked cabinet.
-1.  **The Test:** Go to DevTools **Application > Local Storage**.
-2.  **The Check:** Look for keys like `role: "user"` or `session_token`.
-3.  **Manipulation:** Manually change `role` to `"admin"` and refresh.
-4.  **Clean Fail:** If you suddenly see "Admin" buttons, the app trusts the user too much. **FAIL**.
+1.  **Inspect:** Go to DevTools **Application > Local Storage**.
+2.  **The Check:** Look for keys like `user_role`, `email`, or `session_id`.
+3.  **Manipulation:** Manually change a value (e.g., `is_admin: "false"` to `"true"`) and refresh.
+4.  **Clean Fail:** If the UI grants you new powers, the app trusts the client too much. **FAIL**.
 
 
 
 ---
 
 ### Summary Checklist for a "Clean" Audit
-* **Is it a Pass?** If the "Tap" (Sink) uses `.textContent` or a sanitizer like **DOMPurify**, the water is cleaned before it touches the user.
-* **Is it a Fail?** If the "Water" goes from the "Intake" (URL/Storage) straight to the "Tap" (`innerHTML`/`eval`) with no filters in between.
+* **Is it a Pass?** If the "Tap" (Sink) uses `.textContent` or a library like **DOMPurify**, the water is cleaned before the user sees it.
+* **Is it a Fail?** If "Water" flows from the "Intake" (URL/Storage) straight to a "Tap" (`innerHTML`/`eval`) with no filters in between.
 
-Which "Pipe" would you like to inspect next?
+Which "Pipe" would you like to inspect first on your target site?
