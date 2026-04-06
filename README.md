@@ -56,13 +56,13 @@ Analyze the Assignment
 
 Once you find that line, look at what is on the right side of the = sign. This tells you if the test is a Pass or a Fail.
 
-Scenario A (Pass): expando = "jQuery" + Math.random();
+### Scenario A (Pass): expando = "jQuery" + Math.random();
 
 Background: The data comes from a random generator inside the browser. An attacker cannot "inject" anything into a random number.
 
 Result: CLEAN PASS. Secure.
 
-Scenario B (Fail): expando = location.hash; or expando = window.name;
+### Scenario B (Fail): expando = location.hash; or expando = window.name;
 
 Background: The data comes from a "Source" that an attacker can change.
 
