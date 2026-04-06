@@ -35,7 +35,7 @@ You first need to find where the "water" is coming out. In DevTools:
 Now you need to know where the variable like e.g `expando` came from.
 
 1.  Press Ctrl + Shift + F (Global Search).
-2.  In the search box that appears at the bottom, type: var expando = or just expando =.
+2.  In the search box that appears at the bottom, type: `var expando = ` or just `expando =`.
 3.  Look through the results. You are looking for the line where expando is assigned a value for the first time.
 
 ---
