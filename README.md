@@ -143,7 +143,7 @@ A **Pass** occurs when you find a **Filter** in the **Pipe** (the code between t
 ---
 
 ### 4. Client-Side Resource Manipulation
-* **The Tap:** Search for `script.src =` or `iframe.src =`.
+* **The Tap:** Search for `script.src =` or `script.text =` or `iframe.src =`.
 * **The Intake:** A URL parameter that defines a path (e.g., `?lang=en`).
 * **The Test:** Try `?lang=../../attacker.com/evil`.
 * **✅ STOP (PASS):** If the path is hardcoded or "mapped" (e.g., `var path = config[lang]`).
