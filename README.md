@@ -168,7 +168,7 @@ A **Pass** occurs when you find a **Filter** in the **Pipe** (the code between t
 ---
 
 ### 7. Web Messaging (postMessage)
-* **The Tap:** Search for `window.addEventListener("message", ...)`.
+* **The Tap:** Search for `window.addEventListener("message", ...)` or `window.addEventListener("hashchange", ...)` or `window.addEventListener("popstate", ...)`.
 * **The Pipe:** Look for an origin check: `if (event.origin !== "https://trusted.com") return;`.
 * **✅ STOP (PASS):** If that origin check exists and is strict.
 * **❌ FAIL:** If there is no origin check or if it uses `*` (wildcard).
