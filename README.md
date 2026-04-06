@@ -120,8 +120,6 @@ A **Pass** occurs when you find a **Filter** in the **Pipe** (the code between t
 * **✅ STOP (PASS):** If you see a function in the Call Stack that uses `.textContent` instead of `.innerHTML`, or a library like `DOMPurify.sanitize()`.
 * **❌ FAIL:** If the "dirty water" from the URL reaches the Sink without any changes.
 
-
-
 ---
 
 ### 2. Client-Side URL Redirect
@@ -163,8 +161,6 @@ A **Pass** occurs when you find a **Filter** in the **Pipe** (the code between t
 * **✅ STOP (PASS):** If the frame is blank and the **Console** says "Refused to display... X-Frame-Options: SAMEORIGIN."
 * **❌ FAIL:** If the website loads perfectly inside your local iframe.
 
-
-
 ---
 
 ### 7. Web Messaging (postMessage)
@@ -187,13 +183,4 @@ A **Pass** occurs when you find a **Filter** in the **Pipe** (the code between t
 * **✅ STOP (PASS):** If you see no sensitive data (passwords, PII) or if the data is encrypted.
 * **❌ FAIL:** If you find a key like `is_admin: false`, change it to `true`, refresh, and get admin access.
 
-
-
 ---
-
-### Summary: Where to Stop?
-1.  **Stop at the Source:** If the variable is hardcoded or uses a safe generator (like `new Date()`), the test is a **PASS**.
-2.  **Stop in the Pipe:** If you see a "Filter" function (like `DOMPurify` or `textContent`) in the Call Stack, the test is a **PASS**.
-3.  **Stop at the Sink:** If you reach the Sink and the data is still "dirty" (matches your URL input), the test is a **FAIL**.
-
-Which specific "Pipe" are you looking at right now? Give me the code snippet and I'll tell you if you can stop.
