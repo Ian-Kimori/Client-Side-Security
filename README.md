@@ -4,7 +4,7 @@ To understand client-side security, you have to think like a data-tracker. In th
 
 ---
 
-## 1. The Core Concept: Source, Sink, and Result
+## a. The Core Concept: Source, Sink, and Result
 This is the "Holy Trinity" of client-side vulnerability analysis.
 
 ### The Source (Where data comes from)
@@ -26,7 +26,7 @@ The **Result** is the proof of the exploit. In a "Clean" test, the result is usu
 
 ---
 
-## 2. Deep Dive: The Dangerous Sinks
+## b. Deep Dive: The Dangerous Sinks
 
 ### `.innerHTML`
 * **What it does:** It sets or gets the HTML markup contained within an element.
