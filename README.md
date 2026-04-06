@@ -106,68 +106,94 @@ When you use the Call Stack, you are literally walking through the Pipe. Each "l
 * **The Code "Call Stack" (The Pipe):** The JavaScript logic. If the pipe has a **Filter** (Sanitization), the water stays clean.
 * **The Sink (The Tap):** Where the data is finally executed or displayed. If dirty water reaches a "Tap" like `.innerHTML`, it "splashes" the user with a script.
 
----
+To conduct a "clean" end-to-end audit, we use the **Plumber’s Strategy**. You are looking for a connection between the **Intake** (Source) and the **Tap** (Sink). 
 
-## 1. DOM-based XSS & JavaScript Execution
-**The Goal:** Prove that data from a URL source reaches a dangerous execution sink.
-1.  **Find the Tap (Sink):** In DevTools **Sources**, search (`Ctrl+Shift+F`) for `.innerHTML`, `document.write(`, or `eval(`.
-2.  **Trace to Intake (Source):** Look for variables that pull from `location.hash` or `location.search`.
-3.  **The Test:** Append a unique string to the URL: `site.com/#ZXC123`.
-4.  **Verify:** Set a **Breakpoint** on the sink. If the variable equals `"ZXC123"`, the pipe is connected.
-5.  **Clean Fail:** If you change the URL to `#<img src=x onerror=alert(domain)>` and the alert pops, it is a **FAIL**.
-
-## 2. HTML & CSS Injection
-**The Goal:** Inject "dye" into the water to change the UI or steal data.
-1.  **HTML Test:** Find a field that reflects input (e.g., "Welcome, [Name]"). Input `<u>Test</u>`.
-    * **FAIL:** The text is underlined in the browser.
-2.  **CSS Test:** Input `<style>body{background:red;}</style>`.
-    * **FAIL:** The page background turns red. This proves an attacker can inject styles to "hide" real buttons or "overlay" fake ones.
-
-## 3. Client-Side URL Redirect
-**The Goal:** Prove the "Exit Pipe" can be pointed to a malicious external site.
-1.  **The Source:** Look for URL parameters like `?next=` or `?redirect_to=`.
-2.  **The Pipe:** Search **Sources** for `window.location.href =` or `location.replace(`.
-3.  **The Test:** Change the parameter to `?next=https://google.com`.
-4.  **Clean Result:** If the browser leaves the target domain and loads Google, it is a **FAIL**.
-
-## 4. Cross-Origin Resource Sharing (CORS)
-**The Goal:** Check if the "Back Door" is open for other sites to steal private data.
-1.  **The Test:** Use **Burp Suite** or **curl**. Add the header: `Origin: https://evil.com`.
-2.  **The Response:** Look at the headers returned by the server.
-3.  **Clean Fail:** If you see `Access-Control-Allow-Origin: https://evil.com` **AND** `Access-Control-Allow-Credentials: true`, any site can steal the user's session data. **FAIL**.
-
-## 5. Clickjacking
-**The Goal:** Prove the website can be "hidden" under a fake cover to trick users.
-1.  **The Test:** Create a local `.html` file on your PC:
-    `<html><body><iframe src="https://target-site.com" style="opacity:0.5;"></iframe></body></html>`
-2.  **Verify:** Open the file in Edge/Chrome.
-3.  **Clean Result:** If you see the website inside the frame, it's a **FAIL**. If the browser blocks it (check Console for `X-Frame-Options` errors), it's a **PASS**.
-
-
-
-## 6. Web Messaging (postMessage)
-**The Goal:** Test the "Intercom" between different windows/iframes.
-1.  **Find Listeners:** Search **Sources** for `window.addEventListener("message", ...)`.
-2.  **The Test:** In the **Console**, type: `window.postMessage({"action":"delete"}, "*")`.
-3.  **Clean Fail:** If the app performs the action without checking `event.origin`, it is a **FAIL**.
-
-## 7. WebSockets
-**The Goal:** Intercept the real-time "Radio Stream" of data.
-1.  **Monitor:** Go to DevTools **Network > WS** tab.
-2.  **The Test:** Perform an action and watch the messages.
-3.  **Clean Fail:** If sensitive data (passwords, tokens) is sent in plain text, or if you can "Replay" a message in Burp to repeat an action, it is a **FAIL**.
-
-## 8. Local Storage
-**The Goal:** Check if sensitive "Bottled Water" is left in an unlocked cabinet.
-1.  **Inspect:** Go to DevTools **Application > Local Storage**.
-2.  **The Check:** Look for keys like `user_role`, `email`, or `session_id`.
-3.  **Manipulation:** Manually change a value (e.g., `is_admin: "false"` to `"true"`) and refresh.
-4.  **Clean Fail:** If the UI grants you new powers, the app trusts the client too much. **FAIL**.
+A **Pass** occurs when you find a **Filter** in the **Pipe** (the code between the source and sink) or if the **Source** itself is non-user-controlled (like your `new Date()` example).
 
 ---
 
-### Summary Checklist for a "Clean" Audit
-* **Is it a Pass?** If the "Tap" (Sink) uses `.textContent` or a library like **DOMPurify**, the water is cleaned before the user sees it.
-* **Is it a Fail?** If "Water" flows from the "Intake" (URL/Storage) straight to a "Tap" (`innerHTML`/`eval`) with no filters in between.
+### 1. DOM XSS / JS Execution / HTML Injection
+* **The Tap (Sink):** Search (`Ctrl+Shift+F`) for `.innerHTML`, `document.write`, or `eval()`.
+* **The Pipe (Trace):** Set a **Breakpoint** on the Sink. When it hits, look at the **Call Stack**. Click the functions below the top one to move "upstream."
+* **The Intake (Source):** Look for `location.hash`, `location.search`, or `window.name`.
+* **The Test:** Enter `site.com/#<img src=x onerror=alert(1)>`.
+* **✅ STOP (PASS):** If you see a function in the Call Stack that uses `.textContent` instead of `.innerHTML`, or a library like `DOMPurify.sanitize()`.
+* **❌ FAIL:** If the "dirty water" from the URL reaches the Sink without any changes.
 
-Which "Pipe" would you like to inspect first on your target site?
+
+
+---
+
+### 2. Client-Side URL Redirect
+* **The Tap:** Search for `location.href =` or `location.replace()`.
+* **The Intake:** Look for parameters like `?next=` or `?url=`.
+* **The Test:** Change the URL to `?next=https://google.com`.
+* **✅ STOP (PASS):** If the code checks the destination against a whitelist (e.g., `if (url.startsWith("/dashboard"))`).
+* **❌ FAIL:** If the browser automatically redirects you to Google.
+
+---
+
+### 3. CSS Injection
+* **The Tap:** Search for `.style.setProperty` or code creating `<style>` tags.
+* **The Intake:** Any reflected input (like a username or theme color).
+* **The Test:** Inject `<style>body{display:none;}</style>`.
+* **✅ STOP (PASS):** If the `<` and `>` characters are encoded to `&lt;` and `&gt;` in the **Elements** tab.
+* **❌ FAIL:** If the website content disappears because your CSS was executed.
+
+---
+
+### 4. Client-Side Resource Manipulation
+* **The Tap:** Search for `script.src =` or `iframe.src =`.
+* **The Intake:** A URL parameter that defines a path (e.g., `?lang=en`).
+* **The Test:** Try `?lang=../../attacker.com/evil`.
+* **✅ STOP (PASS):** If the path is hardcoded or "mapped" (e.g., `var path = config[lang]`).
+* **❌ FAIL:** If the **Network** tab shows the browser trying to load a script from the attacker's domain.
+
+---
+
+### 5. CORS (Cross-Origin Resource Sharing)
+* **The Test:** In Burp Suite, add the header `Origin: https://evil.com` to your request.
+* **✅ STOP (PASS):** If the response does **not** contain `Access-Control-Allow-Origin` or if it is fixed to a specific trusted domain.
+* **❌ FAIL:** If you see `Access-Control-Allow-Origin: https://evil.com` AND `Access-Control-Allow-Credentials: true`.
+
+---
+
+### 6. Clickjacking
+* **The Test:** Create a local `.html` file: `<iframe src="https://yoursite.com"></iframe>`.
+* **✅ STOP (PASS):** If the frame is blank and the **Console** says "Refused to display... X-Frame-Options: SAMEORIGIN."
+* **❌ FAIL:** If the website loads perfectly inside your local iframe.
+
+
+
+---
+
+### 7. Web Messaging (postMessage)
+* **The Tap:** Search for `window.addEventListener("message", ...)`.
+* **The Pipe:** Look for an origin check: `if (event.origin !== "https://trusted.com") return;`.
+* **✅ STOP (PASS):** If that origin check exists and is strict.
+* **❌ FAIL:** If there is no origin check or if it uses `*` (wildcard).
+
+---
+
+### 8. WebSockets
+* **The Intake:** Go to **Network > WS**. Click the connection and look at **Messages**.
+* **✅ STOP (PASS):** If messages contain a unique `token` or `nonce` that prevents attackers from spoofing messages.
+* **❌ FAIL:** If you can "Replay" a message in Burp (like `{"action": "transfer_funds"}`) and the server accepts it without a fresh token.
+
+---
+
+### 9. Local Storage
+* **The Intake:** Go to **Application > Local Storage**.
+* **✅ STOP (PASS):** If you see no sensitive data (passwords, PII) or if the data is encrypted.
+* **❌ FAIL:** If you find a key like `is_admin: false`, change it to `true`, refresh, and get admin access.
+
+
+
+---
+
+### Summary: Where to Stop?
+1.  **Stop at the Source:** If the variable is hardcoded or uses a safe generator (like `new Date()`), the test is a **PASS**.
+2.  **Stop in the Pipe:** If you see a "Filter" function (like `DOMPurify` or `textContent`) in the Call Stack, the test is a **PASS**.
+3.  **Stop at the Sink:** If you reach the Sink and the data is still "dirty" (matches your URL input), the test is a **FAIL**.
+
+Which specific "Pipe" are you looking at right now? Give me the code snippet and I'll tell you if you can stop.
