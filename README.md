@@ -60,6 +60,8 @@ Background: The data comes from a "Source" that an attacker can change.
 
 Result: FAIL. Vulnerable to DOM XSS.
 
+---
+
 ## (iii). Use the "Call Stack" (The Time Machine)
 If the variable is passed through many different functions, tracing it manually is hard. Use the Call Stack instead.
 
@@ -164,8 +166,6 @@ To perform a **clean** end-to-end security test on the client side, you must act
 2.  **The Check:** Look for keys like `user_role`, `email`, or `session_id`.
 3.  **Manipulation:** Manually change a value (e.g., `is_admin: "false"` to `"true"`) and refresh.
 4.  **Clean Fail:** If the UI grants you new powers, the app trusts the client too much. **FAIL**.
-
-
 
 ---
 
