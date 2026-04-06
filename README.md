@@ -33,13 +33,6 @@ Now you need to know where the variable `msg` came from.
 3.  **Look at the "Scope" Pane:** On the right side of the screen, look for the **Scope** section. It lists every variable active right now. Find `msg`. What is its value?
 4.  **Look at the "Call Stack":** Right below Scope is the **Call Stack**. It shows you the function that ran *just before* this one. Click the name below the top one. 
 
-Edge will jump to the previous function. Keep doing this until you see something like:
-`var msg = location.hash.substring(1);`
-
-**Boom.** You found the **Source** (`location.hash`).
-
----
-
 Does your code look like one giant, long line of text? If so, clicking that **`{ }`** button is the first step to making sense of it. What do you see when you search for `location.hash`?
 
 To understand client-side security, you have to think like a data-tracker. In the browser, "Source-to-Sink" is the path that data travels. If that path isn't "cleaned" (sanitized or encoded) along the way, the application is vulnerable.
