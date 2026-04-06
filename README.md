@@ -40,8 +40,6 @@ Now you need to know where the variable like e.g `expando` came from.
 
 3.  Look through the results. You are looking for the line where expando is assigned a value for the first time.
 
-4.  On the right side of the screen, look for the **Scope** section. It lists every variable active right now. Find `expando`. What is its value?
-
 ---
 
 ## Analyze the Assignment
@@ -69,11 +67,13 @@ If the variable is passed through many different functions, tracing it manually 
 
 2.  **Trigger the Code:** Refresh the page or trigger the action. The browser will "freeze" on that line.
 
-3.  Look at the "Call Stack" pane on the right. It shows the chain of functions that led to this moment.
+3.  On the right side of the screen, look for the **Scope** section. It lists every variable active right now. Find `expando`. What is its value?
 
-4.  Click the function below the current one in the list. The editor will jump to where the data was sent from.
+4.  Look at the "Call Stack" pane on the right. It shows the chain of functions that led to this moment.
 
-5.  Repeat this until you reach a function that grabs data directly from the URL or Storage.
+5.  Click the function below the current one in the list. The editor will jump to where the data was sent from.
+
+6.  Repeat this until you reach a function that grabs data directly from the URL or Storage.
 
 ---
 
