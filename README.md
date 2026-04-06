@@ -1,10 +1,69 @@
 # Client-Side-Security
+No problem—tracing code can feel like finding a needle in a haystack until you see the "plumbing." Let's break down the **Source-to-Sink** connection using a real-world example and the specific tools in Edge.
+
+Think of it like a **water pipe**:
+1.  **The Source (The Intake):** Where the user (attacker) puts data into the pipe (e.g., the URL).
+2.  **The Code (The Pipe):** The JavaScript functions that move the data around.
+3.  **The Sink (The Tap):** Where the data comes out and is "executed" by the browser.
+
+---
+
+## a. Finding the "Sink" (The Tap)
+You first need to find where the "water" is coming out. In Edge DevTools:
+1.  Press **F12** and go to the **Sources** tab.
+2.  Press **Ctrl + Shift + F** (this opens a search bar at the bottom).
+3.  Search for `.innerHTML`. 
+4.  If you see a result like `document.getElementById('error').innerHTML = msg;`, click it. That is your **Sink**.
+
+
+
+---
+
+## b. Tracing to the "Source" (The Intake)
+Now you need to know where the variable `msg` came from. 
+
+1.  **Set a Breakpoint:** Click the line number next to that `.innerHTML` code. A blue arrow appears.
+2.  **Trigger the Code:** Refresh the page. The website will "freeze," and that line will turn highlighed. 
+3.  **Look at the "Scope" Pane:** On the right side of the screen, look for the **Scope** section. It lists every variable active right now. Find `msg`. What is its value?
+4.  **Look at the "Call Stack":** Right below Scope is the **Call Stack**. It shows you the function that ran *just before* this one. Click the name below the top one. 
+
+Edge will jump to the previous function. Keep doing this until you see something like:
+`var msg = location.hash.substring(1);`
+
+**Boom.** You found the **Source** (`location.hash`).
+
+
+
+---
+
+## c. How to Test "End-to-End" Cleanly
+Once you think you've found a path, you prove it by sending a "Honeypot" string through the pipe.
+
+* **Step A:** Go to your browser address bar and add a unique string: `https://site.com/#ZXC123`
+* **Step B:** Look at your **Scope** pane in DevTools again while the code is paused at your breakpoint.
+* **Step C:** If the variable `msg` now equals `"ZXC123"`, you have confirmed the "Pipe" is connected. 
+
+#### The "Pass" or "Fail" Verdict:
+* **FAIL:** If the code is just `element.innerHTML = msg;`. (The browser will run any script you put in the URL).
+* **PASS:** If the code is `element.textContent = msg;` or if there is a line like `msg = DOMPurify.sanitize(msg);` before it hits the sink.
+
+---
+
+## d. Why you might not "see" it in Edge
+If your Sources tab looks empty or like a mess of random letters:
+1.  **Pretty Print:** Look for the **`{ }`** icon at the bottom left of the code window. Click it to make the code readable.
+2.  **The Search Bar:** Ensure you are using the **Global Search** (Ctrl+Shift+F) and not just the local file search (Ctrl+F).
+3.  **The "Page" Tree:** On the left side of Sources, make sure you've expanded the top folder (usually the website's domain name) to see the `.js` files.
+
+
+
+Does your code look like one giant, long line of text? If so, clicking that **`{ }`** button is the first step to making sense of it. What do you see when you search for `location.hash`?
 
 To understand client-side security, you have to think like a data-tracker. In the browser, "Source-to-Sink" is the path that data travels. If that path isn't "cleaned" (sanitized or encoded) along the way, the application is vulnerable.
 
 ---
 
-## a. The Core Concept: Source, Sink, and Result
+## e. The Core Concept: Source, Sink, and Result
 This is the "Holy Trinity" of client-side vulnerability analysis.
 
 ### The Source (Where data comes from)
@@ -26,7 +85,7 @@ The **Result** is the proof of the exploit. In a "Clean" test, the result is usu
 
 ---
 
-## b. Deep Dive: The Dangerous Sinks
+## f. Deep Dive: The Dangerous Sinks
 
 ### `.innerHTML`
 * **What it does:** It sets or gets the HTML markup contained within an element.
