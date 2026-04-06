@@ -60,7 +60,7 @@ Result: FAIL. Vulnerable to DOM XSS.
 
 ---
 
-## (iii). Use the "Call Stack" (The Time Machine)
+## (iii). Use the "Call Stack" (The Time Machine) (The Pipe)
 If the variable is passed through many different functions, tracing it manually is hard. Use the Call Stack instead.
 
 1.  **Set a Breakpoint:** Click the line number of the sink to set a Breakpoint (a blue/purple arrow).
