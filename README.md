@@ -40,34 +40,13 @@ Edge will jump to the previous function. Keep doing this until you see something
 
 ---
 
-## c. How to Test "End-to-End" Cleanly
-Once you think you've found a path, you prove it by sending a "Honeypot" string through the pipe.
-
-* **Step A:** Go to your browser address bar and add a unique string: `https://site.com/#ZXC123`
-* **Step B:** Look at your **Scope** pane in DevTools again while the code is paused at your breakpoint.
-* **Step C:** If the variable `msg` now equals `"ZXC123"`, you have confirmed the "Pipe" is connected. 
-
-#### The "Pass" or "Fail" Verdict:
-* **FAIL:** If the code is just `element.innerHTML = msg;`. (The browser will run any script you put in the URL).
-* **PASS:** If the code is `element.textContent = msg;` or if there is a line like `msg = DOMPurify.sanitize(msg);` before it hits the sink.
-
----
-
-## d. Why you might not "see" it in Edge
-If your Sources tab looks empty or like a mess of random letters:
-1.  **Pretty Print:** Look for the **`{ }`** icon at the bottom left of the code window. Click it to make the code readable.
-2.  **The Search Bar:** Ensure you are using the **Global Search** (Ctrl+Shift+F) and not just the local file search (Ctrl+F).
-3.  **The "Page" Tree:** On the left side of Sources, make sure you've expanded the top folder (usually the website's domain name) to see the `.js` files.
-
-
-
 Does your code look like one giant, long line of text? If so, clicking that **`{ }`** button is the first step to making sense of it. What do you see when you search for `location.hash`?
 
 To understand client-side security, you have to think like a data-tracker. In the browser, "Source-to-Sink" is the path that data travels. If that path isn't "cleaned" (sanitized or encoded) along the way, the application is vulnerable.
 
 ---
 
-## e. The Core Concept: Source, Sink, and Result
+## c. The Core Concept: Source, Sink, and Result
 This is the "Holy Trinity" of client-side vulnerability analysis.
 
 ### The Source (Where data comes from)
@@ -85,11 +64,9 @@ A **Sink** is a function or DOM object that can execute or render the data it re
 ### The Result (The Impact)
 The **Result** is the proof of the exploit. In a "Clean" test, the result is usually an `alert(document.domain)` or a redirect, proving that the attacker now has control over the user's session in that specific origin.
 
-
-
 ---
 
-## f. Deep Dive: The Dangerous Sinks
+## d. Deep Dive: The Dangerous Sinks
 
 ### `.innerHTML`
 * **What it does:** It sets or gets the HTML markup contained within an element.
