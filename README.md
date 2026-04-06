@@ -93,20 +93,17 @@ If the variable is passed through many different functions, tracing it manually 
 * **Security Risk:** This is the most dangerous sink. If an attacker can get their input into an `eval()` call, they have full execution rights. **Never use `eval()` with user-controlled data.**
 
 ---
+## c. Visualizing the Pipe in your Code "Call Stack"
 
-Does your code look like one giant, long line of text? If so, clicking that **`{ }`** button is the first step to making sense of it. What do you see when you search for `location.hash`?
+Think of the Pipe as everything that happens between the moment the data is born (the Source) and the moment it hits the screen (the Sink).
 
-To understand client-side security, you have to think like a data-tracker. In the browser, "Source-to-Sink" is the path that data travels. If that path isn't "cleaned" (sanitized or encoded) along the way, the application is vulnerable.
-
-To test these vulnerabilities effectively, you must focus on how the browser's Document Object Model (DOM) handles data. In client-side security, the vulnerability isn't usually in the database, but in the **JavaScript logic** running in the user's browser.
-
-To perform a **clean** end-to-end security test on the client side, you must act like a plumber inspecting a building's water system. You aren't just looking for a leak; you are tracing where the "water" (data) enters, how it flows through the "pipes" (JavaScript), and where it eventually comes out of the "tap" (the browser's display).
+When you use the Call Stack, you are literally walking through the Pipe. Each "layer" in that stack is a different section of the pipe where the data might be changed, moved, or cleaned.
 
 ---
 
 ## The "Water System" Analogy
 * **The Source (The Intake):** Where an attacker puts "dirty water" into the system (e.g., URL Bar, Local Storage, or Cookies).
-* **The Code (The Pipe):** The JavaScript logic. If the pipe has a **Filter** (Sanitization), the water stays clean.
+* **The Code "Call Stack" (The Pipe):** The JavaScript logic. If the pipe has a **Filter** (Sanitization), the water stays clean.
 * **The Sink (The Tap):** Where the data is finally executed or displayed. If dirty water reaches a "Tap" like `.innerHTML`, it "splashes" the user with a script.
 
 ---
