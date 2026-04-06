@@ -16,30 +16,7 @@ Think of it like a **water pipe**:
 
 ---
 
-## a. Finding the "Sink" (The Tap)
-You first need to find where the "water" is coming out. In Edge DevTools:
-1.  Press **F12** and go to the **Sources** tab.
-2.  Press **Ctrl + Shift + F** (this opens a search bar at the bottom).
-3.  Search for `.innerHTML`. 
-4.  If you see a result like `document.getElementById('error').innerHTML = msg;`, click it. That is your **Sink**.
-
----
-
-## b. Tracing to the "Source" (The Intake)
-Now you need to know where the variable `msg` came from. 
-
-1.  **Set a Breakpoint:** Click the line number next to that `.innerHTML` code. A blue arrow appears.
-2.  **Trigger the Code:** Refresh the page. The website will "freeze," and that line will turn highlighed. 
-3.  **Look at the "Scope" Pane:** On the right side of the screen, look for the **Scope** section. It lists every variable active right now. Find `msg`. What is its value?
-4.  **Look at the "Call Stack":** Right below Scope is the **Call Stack**. It shows you the function that ran *just before* this one. Click the name below the top one. 
-
-Does your code look like one giant, long line of text? If so, clicking that **`{ }`** button is the first step to making sense of it. What do you see when you search for `location.hash`?
-
-To understand client-side security, you have to think like a data-tracker. In the browser, "Source-to-Sink" is the path that data travels. If that path isn't "cleaned" (sanitized or encoded) along the way, the application is vulnerable.
-
----
-
-## c. The Core Concept: Source, Sink, and Result
+## a. The Core Concept: Source, Sink, and Result
 This is the "Holy Trinity" of client-side vulnerability analysis.
 
 ### The Source (Where data comes from)
@@ -56,6 +33,29 @@ A **Sink** is a function or DOM object that can execute or render the data it re
 
 ### The Result (The Impact)
 The **Result** is the proof of the exploit. In a "Clean" test, the result is usually an `alert(document.domain)` or a redirect, proving that the attacker now has control over the user's session in that specific origin.
+
+---
+
+## b. Finding the "Sink" (The Tap)
+You first need to find where the "water" is coming out. In Edge DevTools:
+1.  Press **F12** and go to the **Sources** tab.
+2.  Press **Ctrl + Shift + F** (this opens a search bar at the bottom).
+3.  Search for `.innerHTML`. 
+4.  If you see a result like `document.getElementById('error').innerHTML = msg;`, click it. That is your **Sink**.
+
+---
+
+## c. Tracing to the "Source" (The Intake)
+Now you need to know where the variable `msg` came from. 
+
+1.  **Set a Breakpoint:** Click the line number next to that `.innerHTML` code. A blue arrow appears.
+2.  **Trigger the Code:** Refresh the page. The website will "freeze," and that line will turn highlighed. 
+3.  **Look at the "Scope" Pane:** On the right side of the screen, look for the **Scope** section. It lists every variable active right now. Find `msg`. What is its value?
+4.  **Look at the "Call Stack":** Right below Scope is the **Call Stack**. It shows you the function that ran *just before* this one. Click the name below the top one. 
+
+Does your code look like one giant, long line of text? If so, clicking that **`{ }`** button is the first step to making sense of it. What do you see when you search for `location.hash`?
+
+To understand client-side security, you have to think like a data-tracker. In the browser, "Source-to-Sink" is the path that data travels. If that path isn't "cleaned" (sanitized or encoded) along the way, the application is vulnerable.
 
 ---
 
