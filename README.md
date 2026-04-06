@@ -106,7 +106,7 @@ To test these vulnerabilities effectively, you must focus on how the browser's D
 ## 1. DOM-based XSS & JS Execution
 **The Goal:** Prove that "dirty water" from the URL reaches an execution "tap" like `eval()` or `.innerHTML`.
 1.  **Source:** Add a "Honeypot" to your URL: `site.com/#ZXC123`.
-2.  **Trace:** In Edge/Chrome DevTools **Sources**, search (`Ctrl+Shift+F`) for `.innerHTML` or `eval(`.
+2.  **Trace:** In DevTools **Sources**, search (`Ctrl+Shift+F`) for `.innerHTML` or `eval(`.
 3.  **The Tap:** Set a **Breakpoint** on that line. Refresh the page.
 4.  **Verify:** Look at the **Scope** window. If the variable equals `"ZXC123"`, the pipe is connected.
 5.  **Clean Fail:** If you can change the URL to `#<img src=x onerror=alert(1)>` and an alert pops, it's a **FAIL**.
