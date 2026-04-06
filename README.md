@@ -1,7 +1,5 @@
 # Client-Side-Security
 
----
-
 To test client-side security "cleanly," you have to act like a plumber inspecting a building's water system. You aren't just looking for a leak; you are tracing where the water enters, where it flows, and where it eventually comes out of the tap.
 
 ---
@@ -10,8 +8,6 @@ To test client-side security "cleanly," you have to act like a plumber inspectin
 * **The Source (The Intake):** This is where the user (or attacker) puts "water" into your pipes. (e.g., the URL Bar, Cookies, or Local Storage).
 * **The Code (The Pipe):** The JavaScript functions that move that data around. If the pipe has a "Filter" (Sanitization), the water stays clean.
 * **The Sink (The Tap):** Where the data is finally used or displayed. If dirty water reaches a "Tap" like `.innerHTML`, it splashes the user with a virus (XSS).
-
----
 
 Think of it like a **water pipe**:
 1.  **The Source (The Intake):** Where the user (attacker) puts data into the pipe (e.g., the URL).
