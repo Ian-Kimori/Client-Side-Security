@@ -35,8 +35,12 @@ You first need to find where the "water" is coming out. In DevTools:
 Now you need to know where the variable like e.g `expando` came from.
 
 1.  Press Ctrl + Shift + F (Global Search).
+
 2.  In the search box that appears at the bottom, type: `var expando = ` or just `expando =`.
+
 3.  Look through the results. You are looking for the line where expando is assigned a value for the first time.
+
+4.  On the right side of the screen, look for the **Scope** section. It lists every variable active right now. Find `expando`. What is its value?
 
 ---
 
@@ -56,15 +60,18 @@ Background: The data comes from a "Source" that an attacker can change.
 
 Result: FAIL. Vulnerable to DOM XSS.
 
-or
+## (iii). Use the "Call Stack" (The Time Machine)
+If the variable is passed through many different functions, tracing it manually is hard. Use the Call Stack instead.
 
-1.  **Set a Breakpoint:** Click the line number next to that `.innerHTML` code. A blue arrow appears.
+1.  **Set a Breakpoint:** Click the line number of the sink to set a Breakpoint (a blue/purple arrow).
 
-2.  **Trigger the Code:** Refresh the page. The website will "freeze," and that line will turn highlighed.
+2.  **Trigger the Code:** Refresh the page or trigger the action. The browser will "freeze" on that line.
 
-3.  **Look at the "Scope" Pane:** On the right side of the screen, look for the **Scope** section. It lists every variable active right now. Find `expando`. What is its value?
+3.  Look at the "Call Stack" pane on the right. It shows the chain of functions that led to this moment.
 
-4.  **Look at the "Call Stack":** Right below Scope is the **Call Stack**. It shows you the function that ran *just before* this one. Click the name below the top one.
+4.  Click the function below the current one in the list. The editor will jump to where the data was sent from.
+
+5.  Repeat this until you reach a function that grabs data directly from the URL or Storage.
 
 ---
 
