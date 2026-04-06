@@ -59,8 +59,11 @@ Result: FAIL. Vulnerable to DOM XSS.
 or
 
 1.  **Set a Breakpoint:** Click the line number next to that `.innerHTML` code. A blue arrow appears.
+
 2.  **Trigger the Code:** Refresh the page. The website will "freeze," and that line will turn highlighed.
+
 3.  **Look at the "Scope" Pane:** On the right side of the screen, look for the **Scope** section. It lists every variable active right now. Find `expando`. What is its value?
+
 4.  **Look at the "Call Stack":** Right below Scope is the **Call Stack**. It shows you the function that ran *just before* this one. Click the name below the top one.
 
 ---
