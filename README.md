@@ -36,22 +36,46 @@ The **Result** is the proof of the exploit. In a "Clean" test, the result is usu
 
 ---
 
-## b. Finding the "Sink" (The Tap)
-You first need to find where the "water" is coming out. In Edge DevTools:
+## (i). Finding the "Sink" (The Tap)
+You first need to find where the "water" is coming out. In DevTools:
 1.  Press **F12** and go to the **Sources** tab.
 2.  Press **Ctrl + Shift + F** (this opens a search bar at the bottom).
-3.  Search for `.innerHTML`. 
-4.  If you see a result like `document.getElementById('error').innerHTML = msg;`, click it. That is your **Sink**.
+3.  Search for e.g `.innerHTML`. 
+4.  If you see a result like e.g `document.getElementById('error').innerHTML = expando;`, click it. That is your **Sink**.
 
 ---
 
-## c. Tracing to the "Source" (The Intake)
-Now you need to know where the variable `msg` came from. 
+## (ii). Tracing to the "Source" (The Intake)
+Now you need to know where the variable like e.g `expando` came from.
+
+1.  Press Ctrl + Shift + F (Global Search).
+2.  In the search box that appears at the bottom, type: var expando = or just expando =.
+3.  Look through the results. You are looking for the line where expando is assigned a value for the first time.
+
+Analyze the Assignment
+
+Once you find that line, look at what is on the right side of the = sign. This tells you if the test is a Pass or a Fail.
+
+Scenario A (Pass): expando = "jQuery" + Math.random();
+
+Background: The data comes from a random generator inside the browser. An attacker cannot "inject" anything into a random number.
+
+Result: CLEAN PASS. Secure.
+
+Scenario B (Fail): expando = location.hash; or expando = window.name;
+
+Background: The data comes from a "Source" that an attacker can change.
+
+Result: FAIL. Vulnerable to DOM XSS.
+
+or
 
 1.  **Set a Breakpoint:** Click the line number next to that `.innerHTML` code. A blue arrow appears.
-2.  **Trigger the Code:** Refresh the page. The website will "freeze," and that line will turn highlighed. 
-3.  **Look at the "Scope" Pane:** On the right side of the screen, look for the **Scope** section. It lists every variable active right now. Find `msg`. What is its value?
-4.  **Look at the "Call Stack":** Right below Scope is the **Call Stack**. It shows you the function that ran *just before* this one. Click the name below the top one. 
+2.  **Trigger the Code:** Refresh the page. The website will "freeze," and that line will turn highlighed.
+3.  **Look at the "Scope" Pane:** On the right side of the screen, look for the **Scope** section. It lists every variable active right now. Find `expando`. What is its value?
+4.  **Look at the "Call Stack":** Right below Scope is the **Call Stack**. It shows you the function that ran *just before* this one. Click the name below the top one.
+
+---
 
 Does your code look like one giant, long line of text? If so, clicking that **`{ }`** button is the first step to making sense of it. What do you see when you search for `location.hash`?
 
@@ -59,7 +83,7 @@ To understand client-side security, you have to think like a data-tracker. In th
 
 ---
 
-## d. Deep Dive: The Dangerous Sinks
+## b. Deep Dive: The Dangerous Sinks
 
 ### `.innerHTML`
 * **What it does:** It sets or gets the HTML markup contained within an element.
